@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// TODO needs more receiver methods rather than allowing other methods to access its internals
 type EngineCtx struct {
 
 	// unique game ID

@@ -7,6 +7,7 @@ import (
 	"github.com/curio-research/go-backend/server/components"
 )
 
+// TODO why are these not receiver methods on World? For testing?
 func AddSmallTile(w *engine.World, x int, y int) int {
 	entity := w.AddEntity()
 
@@ -46,6 +47,7 @@ func AddBlocker(w *engine.World, x int, y int) int {
 	return entity
 }
 
+// TODO why is the tag component have different roles in the tree vs the building?
 // input tree type
 func AddTree(w *engine.World, x int, y int, treeType string) int {
 	entity := w.AddEntity()
@@ -67,6 +69,7 @@ func AddBuilding(w *engine.World, x int, y int, ownerId int, buildingType string
 	return entity
 }
 
+// TODO what does Set do?
 func AddTickJob(w *engine.World, tickNumber int, jobType string, jobData string, tickId string) int {
 	entity := w.AddEntity()
 

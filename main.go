@@ -63,7 +63,7 @@ func main() {
 	// this is where you setup the tick schedules for your game
 	// different events can happen on different ticks
 	// some operations require the game to tick slower
-	// ex: health only regenerates every 20 seconds, but you attack every 5 seconds
+	// ex: health only regenerates every 20 seconds, but you attack every 5 seconds // TODO everything seems to tick at 1 ms intervals?
 	tickSchedule := server.NewTickSchedule()
 
 	// TODO: parallelize systems deterministically

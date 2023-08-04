@@ -16,7 +16,7 @@ var (
 
 	TickJobTypeComponent    = engine.NewComponent[string]("TickJobType", true)
 	TickIdComponent         = engine.NewComponent[string]("TickId", true)
-	TickDataStringComponent = engine.NewComponent[string]("TickData", false)
+	TickDataStringComponent = engine.NewComponent[string]("TickData", false) // JSON request as a string
 	TickNumberComponent     = engine.NewComponent[int]("TickNumber", true)
 )
 

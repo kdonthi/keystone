@@ -13,6 +13,7 @@ type RewindTimeRequest struct {
 	TicksBefore int `json:"ticksBefore"`
 }
 
+// TODO we need error handling after decoding request body
 func RewindTime(ctx *EngineCtx) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		req := RewindTimeRequest{}
