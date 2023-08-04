@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// TODO needs more receiver methods rather than allowing other methods to access its internals
 type EngineCtx struct {
 
 	// unique game ID
@@ -50,6 +51,9 @@ func SetupRoutes(s *gin.Engine, ctx *EngineCtx) {
 
 	// regenerates troops for a player
 	s.POST("/regenerate", RegenerateTroops(ctx))
+
+	// takes a player back to a previous time state
+	s.POST("/rewindTime", RewindTime(ctx))
 
 	// helper routes
 

@@ -56,7 +56,7 @@ func NewGameTick() *GameTick {
 }
 
 // set up a game tick
-func (g *GameTick) Setup(ctx *EngineCtx, tickSchedule *TickSchedule) {
+func (g *GameTick) Setup(ctx *EngineCtx, tickSchedule *TickSchedule) { // TODO call this "Start"
 	tickerTime := time.Duration(g.TickRateMs) * time.Millisecond
 	ticker := time.NewTicker(tickerTime)
 

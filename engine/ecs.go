@@ -48,6 +48,8 @@ type World struct {
 	EcsChanges []ECSData
 
 	ShellMode bool
+
+	troopCache TroopCache
 }
 
 // ECS component
@@ -84,6 +86,10 @@ const (
 type Pos struct {
 	X int `json:"x"`
 	Y int `json:"y"`
+}
+
+func (p Pos) Equal(other Pos) bool {
+	return p.X == other.X && p.Y == other.Y
 }
 
 type EcsValueUnit struct {
@@ -141,6 +147,7 @@ func NewGameWorld() *World {
 
 	w.Entities = NewSparseSet()
 	w.Components = make(map[string]Component)
+	w.troopCache = NewTroopCache()
 
 	return w
 }
@@ -643,6 +650,14 @@ func (world *World) Query(query []QueryCondition) []int {
 	queryCtx.Terminate()
 
 	return resultEntities
+}
+
+func (world *World) AddTroopCacheUpdate(tickNumber, troopID, x, y int) {
+	world.troopCache.AddTroopData(tickNumber, troopID, Pos{X: x, Y: y})
+}
+
+func (world *World) PastTroopPosition(tickNumber, troopID int) (Pos, error) {
+	return world.troopCache.GetTroopPosition(tickNumber, troopID)
 }
 
 // Apply child changed components and values to its parent

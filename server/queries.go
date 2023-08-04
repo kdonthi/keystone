@@ -90,7 +90,7 @@ func ProbabilisticRemoval(arr []int, probability float64) []int {
 }
 
 // three segment queries don't work
-func GetTickJobs(w *engine.World, tickType string, tickNumber int) []int {
+func GetTickJobs(w *engine.World, tickJobType string, tickNumber int) []int {
 	res := w.Query([]engine.QueryCondition{
 		{
 			Component: components.TickNumberComponent.Name(),
@@ -105,7 +105,7 @@ func GetTickJobs(w *engine.World, tickType string, tickNumber int) []int {
 		{
 			Component: components.TickJobTypeComponent.Name(),
 			QueryType: engine.HasExact,
-			Value:     tickType,
+			Value:     tickJobType,
 		},
 	})
 

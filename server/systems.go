@@ -2,6 +2,7 @@ package server
 
 import (
 	"encoding/json"
+	"fmt"
 	"strconv"
 
 	"github.com/curio-research/go-backend/engine"
@@ -10,6 +11,7 @@ import (
 )
 
 var (
+	RewindTimeTickID      = "RewindTime"
 	MoveCalculationTickID = "MoveCalculationTick"
 	MoveTickID            = "Move"
 	AttackTickID          = "Attack"
@@ -18,7 +20,8 @@ var (
 
 // handles troop movement using game ticks
 func SingleMoveSystem(ctx *EngineCtx) error {
-	jobIds := GetTickJobs(ctx.World, MoveTickID, ctx.Ticker.TickNumber)
+	tickNumber := ctx.Ticker.TickNumber
+	jobIds := GetTickJobs(ctx.World, MoveTickID, tickNumber)
 
 	for _, jobId := range jobIds {
 		tickDataString, err := components.TickDataStringComponent.Get(ctx.World, jobId)
@@ -38,6 +41,7 @@ func SingleMoveSystem(ctx *EngineCtx) error {
 
 		// set troop to new position
 		components.PositionComponent.Set(w, req.TroopId, tilePosition)
+		w.AddTroopCacheUpdate(tickNumber, req.TroopId, tilePosition.X, tilePosition.Y)
 
 		w.RemoveEntity(jobId)
 
@@ -49,7 +53,6 @@ func SingleMoveSystem(ctx *EngineCtx) error {
 
 // handles re-spawning NPCs
 func RespawnNPCSystem(ctx *EngineCtx) error {
-
 	npcsInWorld := GetInfantriesOfOwner(ctx.World, 0)
 	npcsToSpawn := MaxNPCInWorld - len(npcsInWorld)
 
@@ -233,4 +236,31 @@ func MoveCalculationSystem(ctx *EngineCtx) error {
 	}
 
 	return nil
+}
+
+func RewindTimeSystem(ctx *EngineCtx) error {
+	tickNumber := ctx.Ticker.TickNumber
+	jobIds := GetTickJobs(ctx.World, RewindTimeTickID, tickNumber)
+
+	for _, jobId := range jobIds {
+		dataStr, _ := components.TickDataStringComponent.Get(ctx.World, jobId)
+
+		var req RewindTimeRequest
+		_ = json.Unmarshal([]byte(dataStr), &req)
+
+		w := engine.StartRecordingStateChanges(ctx.World)
+
+		pos, err := w.PastTroopPosition(tickNumber-req.TicksBefore, req.TroopId)
+		if err != nil {
+			return fmt.Errorf("could not get past troop position for rewindTime request %v", req)
+		}
+
+		components.PositionComponent.Set(w, req.TroopId, pos)
+
+		ctx.Stream.PublishStateChanges(w.ExportEcsChanges(), "")
+		w.RemoveEntity(jobId)
+	}
+
+	return nil
+
 }

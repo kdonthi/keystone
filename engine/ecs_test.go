@@ -127,6 +127,7 @@ func TestRemoveEntityTest(t *testing.T) {
 	}
 }
 
+// TODO why are we adding these as global variables?
 func registerMockComponents(w *World) {
 
 	w.AddComponentNew(TargetPositionComp)
