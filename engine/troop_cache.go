@@ -1,35 +1,34 @@
-package cache
+package engine
 
 import (
 	"fmt"
-	"github.com/curio-research/go-backend/engine"
 	"sync"
 )
 
 type TroopCache struct {
 	mu    *sync.Mutex
-	cache map[int]*latestUpdateFinder[engine.Pos] // map of tick #: map of troop id: location
+	cache map[int]*latestUpdateFinder[Pos] // map of tick #: map of troop id: location
 }
 
 func NewTroopCache() TroopCache {
 	return TroopCache{
 		mu:    &sync.Mutex{},
-		cache: map[int]*latestUpdateFinder[engine.Pos]{},
+		cache: map[int]*latestUpdateFinder[Pos]{},
 	}
 }
 
-func (t *TroopCache) AddTroopData(tickNumber, troopID, x, y int) {
+func (t *TroopCache) AddTroopData(tickNumber, troopID int, pos Pos) {
 	t.mu.Lock()
 	defer t.mu.Unlock()
 
 	if _, ok := t.cache[troopID]; !ok {
-		t.cache[troopID] = newLatestUpdateFinder[engine.Pos]()
+		t.cache[troopID] = newLatestUpdateFinder[Pos]()
 	}
 
-	t.cache[troopID].addUpdate(tickNumber, engine.Pos{X: x, Y: y})
+	t.cache[troopID].addUpdate(tickNumber, pos)
 }
 
-func (t *TroopCache) GetTroopPosition(tickNumber, troopID int) (engine.Pos, error) {
+func (t *TroopCache) GetTroopPosition(tickNumber, troopID int) (Pos, error) {
 	t.mu.Lock()
 	defer t.mu.Unlock()
 
@@ -37,10 +36,10 @@ func (t *TroopCache) GetTroopPosition(tickNumber, troopID int) (engine.Pos, erro
 		if pos, ok := troopPositions.getLatestUpdate(tickNumber); ok {
 			return pos, nil
 		} else {
-			return engine.Pos{}, fmt.Errorf("troop id %v for tick number %v not found", tickNumber, troopID)
+			return Pos{}, fmt.Errorf("troop id %v for tick number %v not found", tickNumber, troopID)
 		}
 	} else {
-		return engine.Pos{}, fmt.Errorf("invalid tick number %v", troopID)
+		return Pos{}, fmt.Errorf("invalid tick number %v", troopID)
 	}
 }
 
@@ -57,7 +56,8 @@ func newLatestUpdateFinder[K any]() *latestUpdateFinder[K] {
 }
 
 func (l *latestUpdateFinder[K]) addUpdate(tickNumber int, value K) {
-	if tickNumber == l.ticksSeen[len(l.ticksSeen)-1] {
+	ticksSeenCount := len(l.ticksSeen)
+	if ticksSeenCount != 0 && tickNumber == l.ticksSeen[ticksSeenCount-1] {
 		return
 	}
 
@@ -68,7 +68,8 @@ func (l *latestUpdateFinder[K]) addUpdate(tickNumber int, value K) {
 func (l *latestUpdateFinder[K]) getLatestUpdate(tickNumber int) (K, bool) {
 	res := binarySearchUpperBound(l.ticksSeen, tickNumber)
 	if res == -1 {
-		return nil, false
+		var result K
+		return result, false
 	}
 
 	return l.cache[res], true

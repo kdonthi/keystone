@@ -22,7 +22,6 @@ package engine
 
 import (
 	"errors"
-	"github.com/curio-research/go-backend/cache"
 	"reflect"
 	"sync"
 )
@@ -50,7 +49,7 @@ type World struct {
 
 	ShellMode bool
 
-	troopCache cache.TroopCache
+	troopCache TroopCache
 }
 
 // ECS component
@@ -87,6 +86,10 @@ const (
 type Pos struct {
 	X int `json:"x"`
 	Y int `json:"y"`
+}
+
+func (p Pos) Equal(other Pos) bool {
+	return p.X == other.X && p.Y == other.Y
 }
 
 type EcsValueUnit struct {
@@ -144,7 +147,7 @@ func NewGameWorld() *World {
 
 	w.Entities = NewSparseSet()
 	w.Components = make(map[string]Component)
-	w.troopCache = cache.NewTroopCache()
+	w.troopCache = NewTroopCache()
 
 	return w
 }
@@ -650,7 +653,7 @@ func (world *World) Query(query []QueryCondition) []int {
 }
 
 func (world *World) AddTroopCacheUpdate(tickNumber, troopID, x, y int) {
-	world.troopCache.AddTroopData(tickNumber, troopID, x, y)
+	world.troopCache.AddTroopData(tickNumber, troopID, Pos{X: x, Y: y})
 }
 
 func (world *World) PastTroopPosition(tickNumber, troopID int) (Pos, error) {
