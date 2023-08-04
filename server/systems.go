@@ -252,7 +252,7 @@ func RewindTimeSystem(ctx *EngineCtx) error {
 		jsonBytes, _ := json.Marshal(req)
 		jsonString := string(jsonBytes)
 
-		AddTickJob(w, tickNumber, MoveTickID, jsonString, strconv.Itoa(req.TroopId))
+		AddTickJob(w, tickNumber, RewindTimeTickID, jsonString, strconv.Itoa(req.TroopId))
 
 		ctx.Stream.PublishStateChanges(w.ExportEcsChanges(), "")
 		w.RemoveEntity(jobId)
