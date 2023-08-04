@@ -2,7 +2,6 @@ package server
 
 import (
 	"encoding/json"
-	"fmt"
 	"strconv"
 
 	"github.com/curio-research/go-backend/engine"
@@ -20,7 +19,8 @@ var (
 
 // handles troop movement using game ticks
 func SingleMoveSystem(ctx *EngineCtx) error {
-	jobIds := GetTickJobs(ctx.World, MoveTickID, ctx.Ticker.TickNumber)
+	tickNumber := ctx.Ticker.TickNumber
+	jobIds := GetTickJobs(ctx.World, MoveTickID, tickNumber)
 
 	for _, jobId := range jobIds {
 		tickDataString, err := components.TickDataStringComponent.Get(ctx.World, jobId)
@@ -40,6 +40,7 @@ func SingleMoveSystem(ctx *EngineCtx) error {
 
 		// set troop to new position
 		components.PositionComponent.Set(w, req.TroopId, tilePosition)
+		ctx.World.AddTroopCacheUpdate(tickNumber, req.TroopId, tilePosition.X, tilePosition.Y)
 
 		w.RemoveEntity(jobId)
 
@@ -237,7 +238,7 @@ func MoveCalculationSystem(ctx *EngineCtx) error {
 }
 
 func RewindTimeSystem(ctx *EngineCtx) error {
-	tickNumber := ctx.Ticker.TickNumber
+	tickNumber := ctx.Ticker.TickNumber + 1
 	jobIds := GetTickJobs(ctx.World, RewindTimeTickID, tickNumber)
 
 	for _, jobId := range jobIds {
@@ -248,12 +249,10 @@ func RewindTimeSystem(ctx *EngineCtx) error {
 
 		w := engine.StartRecordingStateChanges(ctx.World)
 
-		pos, err := w.PastTroopPosition(tickNumber-req.TicksBefore, req.TroopId)
-		if err != nil {
-			return fmt.Errorf("could not get past troop position for rewindTime request %v", req)
-		}
+		jsonBytes, _ := json.Marshal(req)
+		jsonString := string(jsonBytes)
 
-		components.PositionComponent.Set(w, req.TroopId, pos)
+		AddTickJob(w, tickNumber, MoveTickID, jsonString, strconv.Itoa(req.TroopId))
 
 		ctx.Stream.PublishStateChanges(w.ExportEcsChanges(), "")
 		w.RemoveEntity(jobId)
