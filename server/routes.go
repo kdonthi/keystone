@@ -52,6 +52,9 @@ func SetupRoutes(s *gin.Engine, ctx *EngineCtx) {
 	// regenerates troops for a player
 	s.POST("/regenerate", RegenerateTroops(ctx))
 
+	// takes a player back to a previous time state
+	s.POST("/rewindTime", RewindTime(ctx))
+
 	// helper routes
 
 	// fetches entire game state
