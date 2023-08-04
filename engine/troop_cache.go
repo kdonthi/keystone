@@ -66,16 +66,20 @@ func (l *latestUpdateFinder[K]) addUpdate(tickNumber int, value K) {
 }
 
 func (l *latestUpdateFinder[K]) getLatestUpdate(tickNumber int) (K, bool) {
-	res := binarySearchUpperBound(l.ticksSeen, tickNumber)
-	if res == -1 {
+	resIndex := binarySearchUpperBound(l.ticksSeen, tickNumber)
+	if resIndex == -1 {
 		var result K
 		return result, false
 	}
 
-	return l.cache[res], true
+	return l.cache[l.ticksSeen[resIndex]], true
 }
 
 func binarySearchUpperBound(arr []int, target int) int {
+	if len(arr) == 0 {
+		return -1 // Empty array
+	}
+
 	low := 0
 	high := len(arr) - 1
 	result := -1 // Initialize the result to -1 (indicating not found)
@@ -86,6 +90,8 @@ func binarySearchUpperBound(arr []int, target int) int {
 		if arr[mid] < target {
 			result = mid  // Update result to the current index
 			low = mid + 1 // Target is in the right half
+		} else if arr[mid] == target {
+			return mid
 		} else {
 			high = mid - 1 // Target is in the left half
 		}

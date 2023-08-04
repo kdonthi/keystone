@@ -52,17 +52,17 @@ func Test_AddTroopData(t *testing.T) {
 
 	latestUpdateFinder2 := tc.cache[testTroopID2]
 
-	res2, err := latestUpdateFinder2.getLatestUpdate(testTickNumber3)
-	require.Nil(t, err)
+	res2, found := latestUpdateFinder2.getLatestUpdate(testTickNumber3)
+	require.True(t, found)
 	assert.True(t, cmp.Equal(res2, testPos2))
 
 	latestUpdateFinder3 := tc.cache[testTroopID3]
 
-	res31, err := latestUpdateFinder3.getLatestUpdate(testTickNumber1)
-	require.Nil(t, err)
-	assert.True(t, cmp.Equal(res31, testPos1))
+	res31, found := latestUpdateFinder3.getLatestUpdate(testTickNumber1)
+	require.True(t, found)
+	assert.True(t, cmp.Equal(res31, testPos2))
 
-	res32, err := latestUpdateFinder3.getLatestUpdate(testTickNumber3)
-	require.Nil(t, err)
+	res32, found := latestUpdateFinder3.getLatestUpdate(testTickNumber3)
+	require.True(t, found)
 	assert.True(t, cmp.Equal(res32, testPos3))
 }
