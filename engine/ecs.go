@@ -22,6 +22,7 @@ package engine
 
 import (
 	"errors"
+	"github.com/curio-research/go-backend/cache"
 	"reflect"
 	"sync"
 )
@@ -48,6 +49,8 @@ type World struct {
 	EcsChanges []ECSData
 
 	ShellMode bool
+
+	troopCache cache.TroopCache
 }
 
 // ECS component
@@ -141,6 +144,7 @@ func NewGameWorld() *World {
 
 	w.Entities = NewSparseSet()
 	w.Components = make(map[string]Component)
+	w.troopCache = cache.NewTroopCache()
 
 	return w
 }
@@ -643,6 +647,14 @@ func (world *World) Query(query []QueryCondition) []int {
 	queryCtx.Terminate()
 
 	return resultEntities
+}
+
+func (world *World) AddTroopCacheUpdate(tickNumber, troopID, x, y int) {
+	world.troopCache.AddTroopData(tickNumber, troopID, x, y)
+}
+
+func (world *World) PastTroopPosition(tickNumber, troopID int) (Pos, error) {
+	return world.troopCache.GetTroopPosition(tickNumber, troopID)
 }
 
 // Apply child changed components and values to its parent
