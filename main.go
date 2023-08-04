@@ -72,6 +72,7 @@ func main() {
 	tickSchedule.AddTickSystem(gameTick.TickRateMs, server.SingleMoveSystem)
 	tickSchedule.AddTickSystem(gameTick.TickRateMs, server.AttackSystem)
 	tickSchedule.AddTickSystem(gameTick.TickRateMs, server.RegenerateSystem)
+	tickSchedule.AddTickSystem(gameTick.TickRateMs, server.RewindTimeSystem)
 
 	// this is the master game context being passed around, containing pointers to everything
 	gameCtx := &server.EngineCtx{
