@@ -6,7 +6,6 @@ import (
 	"sync"
 )
 
-// TODO want a struct that returns the value of the largest number before it if there is no key for it
 type TroopCache struct {
 	mu    *sync.Mutex
 	cache map[int]*latestUpdateFinder[engine.Pos] // map of tick #: map of troop id: location
@@ -30,7 +29,7 @@ func (t *TroopCache) AddTroopData(tickNumber, troopID, x, y int) {
 	t.cache[troopID].addUpdate(tickNumber, engine.Pos{X: x, Y: y})
 }
 
-func (t *TroopCache) GetTroopPosition(tickNumber, troopID, secondsBefore int) (engine.Pos, error) {
+func (t *TroopCache) GetTroopPosition(tickNumber, troopID int) (engine.Pos, error) {
 	t.mu.Lock()
 	defer t.mu.Unlock()
 
@@ -45,8 +44,6 @@ func (t *TroopCache) GetTroopPosition(tickNumber, troopID, secondsBefore int) (e
 	}
 }
 
-// keep a store of the last update tick
-// have an array as well as a map?
 type latestUpdateFinder[K any] struct {
 	ticksSeen []int
 	cache     map[int]K

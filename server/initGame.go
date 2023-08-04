@@ -27,14 +27,14 @@ var (
 	WorldHeight int = 100
 )
 
-// TODO: refactooor to somewhere else
+// TODO: refactor to somewhere else
 var PlayerCollection *mongo.Collection
 var WorldsCollection *mongo.Collection
 
 // initialize world map and initial objects
 func InitializeMap(w *engine.World, seed int) {
 
-	RegisterAllComponents(w)
+	registerAllComponents(w)
 
 	farmBuildingCount := 5
 	humanBarracksCount := 5
@@ -255,7 +255,7 @@ func SpawnNPCsDeterministic(w *engine.World, npcCount int, seed int) {
 }
 
 // register all components for game world
-func RegisterAllComponents(w *engine.World) {
+func registerAllComponents(w *engine.World) {
 	w.AddComponentNew(components.TagComponent)
 	w.AddComponentNew(components.PositionComponent)
 	w.AddComponentNew(components.OwnerIdComponent)
