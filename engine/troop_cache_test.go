@@ -66,3 +66,38 @@ func Test_AddTroopData(t *testing.T) {
 	require.True(t, found)
 	assert.True(t, cmp.Equal(res32, testPos3))
 }
+
+func Test_GetTroopPosition(t *testing.T) {
+	tc := NewTroopCache()
+
+	tc.AddTroopData(testTickNumber1, testTroopID1, testPos1)
+	tc.AddTroopData(testTickNumber1, testTroopID3, testPos2)
+	tc.AddTroopData(testTickNumber2, testTroopID2, testPos2)
+	tc.AddTroopData(testTickNumber3, testTroopID3, testPos3)
+
+	require.Contains(t, tc.cache, testTroopID1)
+	assert.Contains(t, tc.cache[testTroopID1].cache, testTickNumber1)
+
+	p1, err := tc.GetTroopPosition(testTickNumber1, testTroopID1)
+	require.Nil(t, err)
+	assert.True(t, cmp.Equal(p1, testPos1))
+
+	_, err = tc.GetTroopPosition(testTickNumber1, testTroopID2)
+	require.NotNil(t, err)
+
+	p2, err := tc.GetTroopPosition(testTickNumber2, testTroopID2)
+	require.Nil(t, err)
+	assert.True(t, cmp.Equal(p2, testPos2))
+
+	p31, err := tc.GetTroopPosition(testTickNumber1, testTroopID3)
+	require.Nil(t, err)
+	assert.True(t, cmp.Equal(p31, testPos2))
+
+	p32, err := tc.GetTroopPosition(testTickNumber2, testTroopID3)
+	require.Nil(t, err)
+	assert.True(t, cmp.Equal(p32, testPos2))
+
+	p33, err := tc.GetTroopPosition(testTickNumber3, testTroopID3)
+	require.Nil(t, err)
+	assert.True(t, cmp.Equal(p33, testPos3))
+}
