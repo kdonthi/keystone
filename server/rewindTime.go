@@ -9,8 +9,8 @@ import (
 )
 
 type RewindTimeRequest struct {
-	TroopId       int `json:"troopID"`
-	SecondsBefore int `json:"secondsBefore"`
+	TroopId     int `json:"troopID"`
+	TicksBefore int `json:"ticksBefore"`
 }
 
 func RewindTime(ctx *EngineCtx) gin.HandlerFunc {
@@ -18,21 +18,20 @@ func RewindTime(ctx *EngineCtx) gin.HandlerFunc {
 		req := RewindTimeRequest{}
 		DecodeRequestBody(c, &req)
 
-		id := uuid.New().String()
-
 		tickReq := RewindTimeRequest{
-			TroopId:       req.TroopId,
-			SecondsBefore: req.SecondsBefore,
+			TroopId:     req.TroopId,
+			TicksBefore: req.TicksBefore,
 		}
 
 		jsonBytes, _ := json.Marshal(tickReq)
 		jsonString := string(jsonBytes)
 
-		tick := ctx.Ticker.TickNumber + 1 // TODO what if tick passes by?
+		tick := ctx.Ticker.TickNumber + 1 // TODO what if tick passes by? should we also have a method to calculate this?
 
-		AddTickJob(ctx.World, tick, MoveCalculationTickID, jsonString, strconv.Itoa(req.TileId))
+		AddTickJob(ctx.World, tick, MoveCalculationTickID, jsonString, strconv.Itoa(req.TroopId)) // TODO what is the point of the tickID?
 		ctx.AddTickTransaction(MoveCalculationTickID, tick, jsonString)
 
+		id := uuid.New().String()
 		c.JSON(http.StatusOK, CreateBasicResponseObject(id))
 	}
 }
