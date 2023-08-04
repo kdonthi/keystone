@@ -20,8 +20,8 @@ var (
 
 // handles troop movement using game ticks
 func SingleMoveSystem(ctx *EngineCtx) error {
-	number := ctx.Ticker.TickNumber
-	jobIds := GetTickJobs(ctx.World, MoveTickID, number)
+	tickNumber := ctx.Ticker.TickNumber
+	jobIds := GetTickJobs(ctx.World, MoveTickID, tickNumber)
 
 	for _, jobId := range jobIds {
 		tickDataString, err := components.TickDataStringComponent.Get(ctx.World, jobId)
@@ -41,7 +41,7 @@ func SingleMoveSystem(ctx *EngineCtx) error {
 
 		// set troop to new position
 		components.PositionComponent.Set(w, req.TroopId, tilePosition)
-		w.AddTroopCacheUpdate(number, req.TroopId, tilePosition.X, tilePosition.Y)
+		w.AddTroopCacheUpdate(tickNumber, req.TroopId, tilePosition.X, tilePosition.Y)
 
 		w.RemoveEntity(jobId)
 
